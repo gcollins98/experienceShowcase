@@ -1,0 +1,394 @@
+ File:        proj1.py                                                         
+# Author:      Gavin Collins                                                    
+# Date:        10-28-2018                                                       
+# Section:     22                                                               
+# E-mail:      gavinc1@umbc.edu                                                 
+# Description: This program is designed to take a user through a text based \   
+    # adventure game where they try to escape a monster:                        
+##################################                                              
+from random import randint, seed #                                              
+seed(100)                        #                                              
+##################################                                              
+
+#Constants for player and monster                                               
+MIN_HEALTH = 0
+MAX_PLAYER_HEALTH = 100
+MAX_DEM_HEALTH = 300
+MAX_DEM_DAMAGE = 20
+
+#Win Condition Constants                                                        
+SURVIVE_DAYS = 7
+SURVIVE_DISTANCE = 150
+
+# Lists of findable food and items                                              
+FOODS = ["Reece's Pieces", "Pop Rocks", "Ovaltine", "Wonder Bread", "Twinkies"]
+ITEMS = ["Sword", "Bicycle", "Hi-C", "Heelys", "Walkman", "Laser Cannon", \
+         "Rubber Band"]
+WEAPONS = ["Sword","Laser Cannon","Rubber Band", "Flash Light","Walkie Talkie"]
+
+
+#Item Damage constants when equipped                                            
+SWORD_DAMAGE = 50
+FLASH_LIGHT_DAMAGE = 5
+RUBBER_BAND_DAMAGE = 25
+LASER_CANNON_DAMAGE = 100
+WALKIE_TALKIE_DAMAGE = 10
+
+#Food Value Constants                                                           
+REESES_PIECES = -30
+POP_ROCKS = -5
+OVALTINE = 15
+WONDER_BREAD = 25
+TWINKIES = 30
+# equipped item                                                                 
+equippedItem = "N/A"
+
+# Menu Constants                                                                
+DISPLAY_INVENTORY = 1
+VIEW_CURRENT_STATS = 2
+EAT_EGGO_WAFFLE = 3
+NOTHING_ELSE = 4
+
+PACK_UP_CAMP = 1
+STAY_IN_CAMP = 2
+
+EQUIP_ITEM = 1
+UNEQUIP_ITEM = 2
+NEVERMIND = 3
+
+EAT = 1
+PUT_BACK = 2
+
+# Menus                                                                         
+MORNING_MENU = ["View Inventory", "View Current Stats", "Eat an Eggo"\
+                " Waffle","Nothing Else"]
+CAMP_MENU = ["Pack up camp", "Stay in camp"]
+FIGHT_MENU = ["Fight", "Flail", "Flee"]
+EQUIP_MENU = ["Equip Item", "Unequip Item", "Nvermind"]
+EATING_MENU = ["Eat", "Put back"]
+EQUIPPED_ITEM = [equippedItem]
+# displayMenu() provides the user with an option menu for the current action            
+# Input: user menu selection                                                            
+# Output: prints the menu for current task                                              
+
+def displayMenu(menu):
+
+    print ("Your options are: ")
+    count = 0
+    # Display menu Choices                                                              
+    while count < len (menu):
+        print( count+1, "-", menu[count])
+
+        count +=1
+
+# getUserChoice() the function serves to collect and validate the users menu            
+#                 choice.                                                               
+# Input:          menu                                                                  
+# Output:         userChoice                                                            
+
+def getUserChoice(menu):
+    menuChoice = int( input("Enter a choice: "))
+
+    while menuChoice < 1 or menuChoice > len(menu):
+        print("Please enter a valid choice!")
+        menuChoice = int( input("Enter a choice: "))
+    
+    return menuChoice
+    
+     calcDamage() determines the players damage when they strike the monster               
+# Input: equippedItem                                                                   
+# Output: playerDamage                                                                  
+
+def calcDamage(item):
+
+    playerDamage = 0
+
+    if item == "Flash Light":
+        playerDamage = FLASH_LIGHT_DAMAGE
+    elif item == "Walkie Talkie":
+        playerDamage = WALKIE_TALKIE_DAMAGE
+    elif item == "Rubber Band":
+        playerDamage = RUBBER_BAND_DAMAGE
+    elif item == "Sword":
+        playerDamage = Sword_DAMAGE
+    elif item == "Laser Cannon":
+        playerDamage = LASER_CANNON_DAMAGE
+
+    return playerDamage
+
+
+
+
+
+##############                                                                          
+#demogorgonFight() executes a fight between the player and demogorgon\                  
+#                  continues until someone wins or escapes                              
+# Input: playerHealth,equippedItem,inventory                                            
+# Output: returns playerHealth after the fight                                          
+def demogorgonFight(equippedItem,playerHeatlh,inventory):
+    print("The Demogorgon appears, it wants to fight.")
+
+    monsterHealth = MAX_DEM_HEALTH
+    monsterDamage = MAX_DEM_DAMAGE
+
+    if "Hi-C" in inventory:
+        monsterHealth = MAX_DEM_HEALTH / 2
+
+    elif "Walkman" in inventory:
+        monsterDamage = MAX_DEM_DAMAGE * 0.75
+
+    while fightstopped == False:
+        print("Player Health:",playerHealth)
+      	print("Monster Health:",monsterHealth)
+      	print("What do you want to do?: ")
+
+        displayMenu(FIGHT_MENU)
+        fightAction = getUserInput(FIGHT_MENU)
+
+  if fightAction == Fight:
+            if equippedItem == "N/A":
+                print("You deal 0 damage to the monster because you dont have"\
+                      " any item equipped.")
+            else:
+                playerDamage = calcDamage(item)
+                print("You hit the monster with your,", equippedItem + \
+                      "for",playerDamage + " damage.")
+                monsterhealth -= playerDamage
+
+        elif fightAction == Flail:
+            playerHealth = 0
+            print("You flailed and the monster has killed you. Try again!")
+
+        elif fightAction == Flee:
+            escape = randInt(1,10)
+
+            if escape >=1 and excape <4:
+                fightstopped = True
+                print("You escape!")
+
+            else:
+                print("The monster hits you for,",monsterDamage + " damage.")
+
+                if playerHealth - monsterDamage/2 <= 0:
+                    fightstopped = True
+                    playerHealth = 0
+                else:
+                    playerHealth -= monsterDamage/2
+        if playerHealth <=0 and fightAction != Flee:
+            print("You died to the monster!")
+            fighstopped = True
+
+        if monsterHealth <= 0:
+            fightstopped = True
+            print("You have stopped the monster, and get away with your life.")
+
+        return playerHealth
+
+##############                                                                          
+
+#eat() this function serves to calculate user health after consuming a food             
+#      item from a backpack discovered when walking                                     
+# Input: current playerHealth and food item value                                       
+# Output: new playerHealth                                                              
+
+def eat(food, playerHealth):
+    playerHealth = playerHealth + (food)
+
+    if playerhealth > MAX_PLAYER_HEALTH:
+        playerHealth = MAX_PLAYER_HEALTH
+        print("You have been healed to full health.")
+
+    elif playerHealth < MAX_PLAYER_HEALTH:
+        print("You were healed for",(food),"you now have",playerHealth,\
+              "health.")
+def main():
+    playerHealth = 100
+    monsterHealth = 300
+    equippedItem = ["N/A"]
+    distanceTraveled = 0
+    inventory = ["Walkie Talkie", "Flash Light"]
+    day = 0
+    startHealth = 100
+
+    while (playerHealth > MIN_HEALTH) and distanceTraveled < SURVIVE_DISTANCE\
+          and (day < SURVIVE_DAYS):
+        #Reset Demogorgon health to 300                                                 
+        monsterHealth = MAX_DEM_HEALTH
+        waffleCounter = 0
+
+        #The morning action sequence; from veiwing inventory                            
+
+        displayMenu(MORNING_MENU)
+        morningChoice = getUserChoice(MORNING_MENU)
+
+        while morningChoice != NOTHING_ELSE:
+
+            if morningChoice == DISPLAY_INVENTORY:
+
+                print ("Here is what your inventory looks like: ")
+                print (inventory)
+
+                displayMenu(EQUIP_MENU)
+                itemChoice = getUserChoice(EQUIP_MENU)
+                
+                
+                if itemChoice == EQUIP_ITEM:
+                    displayMenu(inventory)
+                    print("What weapon would you like to equip?")
+
+                    weaponChoice = getUserChoice(inventory) - 1
+
+                    if inventory[weaponChoice] in WEAPONS:
+                        equippedItem = inventory[weaponChoice]
+                        print("You have equipped the:",equippedItem)
+
+                    else:
+                        print("Please choose a valid weapon.")
+
+                elif itemChoice == UNEQUIP_ITEM:
+
+                    displayMenu(equippedItem)
+                    unequipItem = getUserChoice(equippedItem)
+
+
+            elif morningChoice == VIEW_CURRENT_STATS:
+                print ("Current health: ", startHealth)
+                print ("Distance traveled", distanceTraveled)
+                print ("Equipped Item", equippedItem)
+                print ("Days survived",day)
+           elif morningChoice == EAT_EGGO_WAFFLE:
+
+                while waffleCounter == 0:
+                    waffleCounter += 1
+
+                    if playerHealth <= 90:
+                        playerHealth += 10
+                        print ("You consumed the waffle and your health has"\
+                           " increased by 10 points.")
+
+                    elif playerHealth > 90 and playerHealth < 100:
+                        playerHealth = MAX_PLAYER_HEALTH
+                        print ("You consumed the waffle and your health has"\
+                           " increased to 100.")
+
+                    elif playerHealth == MAX_PLAYER_HEALTH:
+                        print ("You have full health.")
+
+
+            displayMenu(MORNING_MENU)
+            morningChoice = getUserChoice(MORNING_MENU)
+
+
+        print ("The Demogorgon looms in the distance. Do you wish to"\
+               " leave camp or stay put?")
+ displayMenu(CAMP_MENU)
+        campChoice = getUserChoice(CAMP_MENU)
+        trench = False
+        if campChoice == PACK_UP_CAMP:
+            startHealth = playerHealth
+
+            # Determine if something happens to the player when walking                 
+            walkingEvent = randint(1,10)
+
+            # Demogorgon FIGHT                                                          
+            if walkingEvent <= 3:
+                demogorgonFight(equippedItem,playerHeatlh,inventory)
+
+
+
+            #Find Backpack with a food item                                             
+            elif walkingEvent > 3 and walkingEvent <= 5:
+
+                randomItem = randInt(1,5)
+                print("You find a,", food[randomItem-1])
+                print("Would you like to eat it?")
+                 discoveredFood = food[randomItem-1]
+
+                displayMenu(EATING_MENU)
+                eatChoice = getUserInput(EATING_MENU)
+
+                if eatChoice == EAT:
+
+                    eat(discoveredFood,playerHealth)
+
+                elif eatChoice == PUT_BACK:
+                    print("You put the",discoveredFood,"back in the backpack.")
+
+
+            elif walkingEvent > 5 and walkingEvent <= 7:
+
+                print("You come across and enter a shed with an item inside.")
+                randomEquipment = randInt(1,7)
+
+                print("You have found a,",ITEMS[randomEquipment-1])
+                newItem = ITEMS[randomEquipment-1]
+
+                while newItem not in inventory:
+                    inventory.append( newItem )
+                     elif walkingEvent > 7 and walkingEvent <=9:
+                print("You fall into a trench and only travel half the"\
+                      " distance as a result.")
+                trench = True
+
+            elif walkingEvent == 10:
+                print("Nothing interesting happened today, but it's better"\
+                      " than dying.")
+
+            if trench == False:
+
+                if "Heelys" not in inventory and "Bicycle" not in inventory:
+                    distanceTraveled += ((startHealth / 4) + 5)
+
+                if "Bicycle" in inventory:
+                    distanceTraveled += (1.5)((startHealth / 4) + 5)
+                    print("The bike allowed you to travel mush faster, you"\
+                          " have traveled",distanceTraveled+" miles.")
+
+                elif "Heelys" in inventory:
+                    distanceTraveled += (1.25)((startHealth / 4) + 5)
+                    print("The Heelys helped you travel faster, you have"\
+                          " traveled",distanceTraveled+" miles.")
+                day += 1
+if trench == True:
+
+                if "Heelys" not in inventory and "Bicycle" not in inventory:
+                    distanceTraveled += (((startHealth / 4) + 5)) / 2
+
+                if "Bicycle" in inventory:
+                    distanceTraveled += ((1.5)((startHealth / 4) + 5)) / 2
+                    print("The bike allowed you to travel mush faster, you"\
+                          " have traveled",distanceTraveled+" miles.")
+
+                elif "Heelys" in inventory:
+                    distanceTraveled += ((1.25)((startHealth / 4) + 5)) / 2
+                    print("The Heelys helped you travel faster, you have"\
+                          " traveled",distanceTraveled+" miles.")
+                day += 2
+
+        elif campChoice == STAY_IN_CAMP:
+            stayEvent = randInt(1,10)
+
+            if stayEvent >=1 and stayEvent < 8:
+                fight(equippedItem,playerHealth,inventory)
+
+elif stayEvent >=8 and stayEvent <=10:
+                print("Nothing happens today, you heal back to full health.")
+                playerHealth = MAX_PLAYER_HEALTH
+
+            day += 1
+
+
+    if playerHealth > 0 and (days >= 7 or distanceTraveled >=150):
+        print("You have escaped the demogorgon and have won the game, "\
+              "CONGRATULATIONS!!!!")
+    elif playerHealth < 0:
+        print("You have died and as a result lost the game, please try again.")
+
+    print("You excaped with",playerHealth)
+    print("You traveled",traveledDistance)
+    print("You survived", day)
+
+main()
+
+
+
