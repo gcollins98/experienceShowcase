@@ -1,0 +1,207 @@
+# File:        project2.py
+# Author:      Gavin Collins
+# Date:        11-8-2018
+# Section:     22
+# E-mail:      gavinc1@umbc.edu
+# Description: This program is designed to allow a user to play against another \
+#              player or the computer in a game of connect 4.
+
+
+from random import randint, seed
+seed(1000)
+
+
+# Constants
+MIN_COLUMN_VALUE = 5
+MIN_ROW_VALUE = 5
+
+MIN_COLUMN_CHOICE = 1
+
+PLAYER_1_PIECE = "X"
+PLAYER_2_PIECE = "O"
+
+PLACE_HOLDER = "_"
+
+
+
+# printBoard:   This method is designed to generate the playing board after\
+#                  the players have chosen their desired size.
+# Input:           int; row and column sizes
+# Output:          returns gameBoard
+
+def printBoard(gameBoard):
+    
+    # Prints the game board
+    row = 0
+    while row < len(gameBoard):
+        col = 0
+        while col < len( gameBoard[row] ):
+            print( gameBoard[row][col], end = " ")
+            col += 1
+        print()
+        row += 1
+        
+    return (gameBoard)
+
+
+# addUserMove()      This method is designed to add each user move to the \
+#                    playing board.
+# Input:             string; valid player move
+# Output:            altered game board
+
+def addUserMove(playerMove,gameBoard,playerPiece):
+    row = len(gameBoard) - 1
+    spaceCheck = False
+    playerMove -= 1
+        
+        
+    while spaceCheck == False:
+        
+        if gameBoard[0][playerMove] != PLACE_HOLDER:
+            spaceCheck = True
+            print("Choose another row, this one is full.")
+        if gameBoard[row][playerMove] == PLACE_HOLDER:
+            gameBoard[row][playerMove] = playerPiece
+            spaceCheck = True
+        
+        else: 
+            row -= 1
+        
+    printBoard(gameBoard)
+
+
+# win()              This method is designed to check and see if a player won.
+# Input:             game board
+# Output:            boolean flag will change to true
+
+def win(gameBoard,userColumnSize,userRowSize,playerPiece):
+    # Horizontal win
+    winCondition = False
+    for r in range(userRowSize):
+        for c in range(userColumnSize - 3):
+            if gameBoard[r][c] == playerPiece and gameBoard[r][c+1] == playerPiece \
+            and gameBoard[r][c+2] == playerPiece and gameBoard[r][c+3] == playerPiece:
+                    winCondition = True
+            if winCondition == True:
+                return (winCondition)
+    # Vertical win
+    for r in range(userRowSize - 3):
+        for c in range(userColumnSize):
+            if gameBoard[r][c] == playerPiece and gameBoard[r+1][c] == playerPiece \
+            and gameBoard[r+2][c] == playerPiece and gameBoard[r+3][c] == playerPiece:
+                    winCondition = True
+            if winCondition == True:
+                return(winCondition)
+
+    # downward diaganol
+    for r in range(userRowSize - 3):
+        for c in range(userColumnSize - 3):
+            if gameBoard[r][c] == playerPiece and \
+            gameBoard[r+1][c+1] == playerPiece and \
+            gameBoard[r+2][c+2] == playerPiece and \
+            gameBoard[r+3][c+3] == playerPiece:
+                    winCondition = True
+            if winCondition == True:
+                return (winCondition)
+            
+            # upward diagnol
+    for r in range(userRowSize-3):
+        for c in range(3,userColumnSize):
+            if gameBoard[r][c] == playerPiece and \
+            gameBoard[r+1][c-1] == playerPiece and \
+            gameBoard[r+2][c-2] == playerPiece and \
+            gameBoard[r+3][c-3] == playerPiece:
+                    winCondition = True
+            if winCondition == True:
+                return (winCondition)
+    
+    return (winCondition)
+
+
+# main()             This method is designed to call the other methods and \
+#                    execute the playing of the game.
+# Input:             none
+# Output:            Game board with win, loss, or tie
+
+def main(): 
+    
+    # Get Height of board
+    userRowSize = int(input("Enter a Height for the board: ")) 
+    
+    # Make sure Height is valid
+    while userRowSize < MIN_ROW_VALUE:
+        userRowChoice = int(input("Enter a Height for the board: "))
+    
+    
+    userColumnSize = int(input("Enter a Width for the board: "))
+   
+    # Get board Width 
+    while userColumnSize < MIN_COLUMN_VALUE:
+        userColumnSize = int(input("Enter a Width for the board)"))
+   
+    computer = input("Would you like to play the computer? (y/n)")
+    if computer == 'y':
+        computer = True
+    else:
+        computer = False
+        
+    # Establishes empty board
+    gameBoard = [ ]
+   
+    # Builds the game board
+    while len(gameBoard) < userRowSize:
+        boardRow = [ ]
+        
+        while len(boardRow) < userColumnSize:
+            boardRow.append(PLACE_HOLDER)
+       
+        gameBoard.append(boardRow)
+   
+    printBoard(gameBoard)
+    
+    
+    
+    # initialize the win condition to false
+    winCondition = False
+    while winCondition == False:
+        
+        # Get a move from player one 
+        playerOneMove = int(input(print("Player one, what is your move ( 1 -",\
+                                        userColumnSize,"):" )))
+        while playerOneMove < 0 or playerOneMove > userColumnSize:
+            playerOneMove = int(input(print("Player one, what is your move ( 1 -",\
+                                        userColumnSize,"):" )))
+            
+        addUserMove(playerOneMove, gameBoard,PLAYER_1_PIECE)
+        winCondition = win(gameBoard,userColumnSize,userRowSize,PLAYER_1_PIECE)
+        if winCondition == True:
+            print("Player one wins!")
+        
+        # Get a move from player two  
+        if computer == False and winCondition == False:
+            playerTwoMove = int(input(print("Player two, what is your move ( 1 -",\
+                                        userColumnSize,"):" )))
+       
+            while playerTwoMove < 0 or playerTwoMove > userColumnSize:
+                playerTwoMove = int(input(print("Player one, what is your move ( 1 -",\
+                                        userColumnSize,"):" )))
+                    
+            addUserMove(playerTwoMove, gameBoard, PLAYER_2_PIECE)
+            winCondition = win(gameBoard,userColumnSize,userRowSize,PLAYER_2_PIECE)
+            if winCondition == True:
+                print("Player two wins!")
+                
+        elif winCondition == False and computer == True:
+            
+            print("Computer's turn: ")
+            playerTwoMove = randint(1,len(gameBoard))
+            print("Computer chose column:",playerTwoMove)
+            addUserMove(playerTwoMove, gameBoard, PLAYER_2_PIECE)
+            winCondition = win(gameBoard,userColumnSize,userRowSize,PLAYER_2_PIECE)
+    # Check for win
+       
+    
+main()
+
+
+
